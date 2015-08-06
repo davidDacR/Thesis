@@ -1,33 +1,41 @@
+###############################################################
+#Plotting PQI* of WBSs (X) with the defects found in IT/ST (Y)#
+###############################################################
 
 library(plotly)
 
-# setear driver
+# set driver
 m<-dbDriver("MySQL");
 
-#Conectarse a la Base de datos MySQL
+#connect to the DB in MySQL
 con<-dbConnect(m,user='root',password='admin',host='localhost',dbname='tsppacedb');
 
-#incrementar cantidad de filas
 options(max.print=1000000);
 vectorT<-c();
 vectorX<-c();
 vectorY<-c();
 
-#count of projects
-sqlcmd_1 <- paste("select count(*) from project");
-projectCantQ <- dbSendQuery(con, sqlcmd_1);
-projectCantAux <- dbFetch(projectCantQ, n = -1);
-projectCant <- projectCantAux[1,1];
+#get the list of projects
+sqlcmd_2 <- paste("select distinct(pi.project_key)  from  plan_item pi
+                  JOIN defect_log_fact_hist d  where d.plan_item_key=pi.plan_item_key;");  
+projectsQ <- dbSendQuery(con, sqlcmd_2);
+projectsAux <- dbFetch(projectsQ, n = -1);
 
-proj = 1;
+#get total projects
+sqlcmd_3 <- paste("select count(*) from (select distinct(pi.project_key)  from  plan_item pi
+                  JOIN defect_log_fact_hist d  where d.plan_item_key=pi.plan_item_key) as b");
+cantProjQ <- dbSendQuery(con, sqlcmd_3);
+cantProjAux <- dbFetch(cantProjQ, n = -1);
+projectCant <- cantProjAux[1,1];
+
+p = 1;
 contCompGraf = 1;
 
-##########################
-
-contador <- 0;
-
-for (proj in 1:projectCant) {
+for (p in 1:projectCant) {
   
+  proj <- projectsAux[p,1];
+  
+  #get the list of wbs
   sqlcmd_2 <- paste("select distinct(w.wbs_element_key) FROM time_log_fact_hist tl
                               INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                               INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -36,6 +44,7 @@ for (proj in 1:projectCant) {
   componentsQ <- dbSendQuery(con, sqlcmd_2);
   componentsAux <- dbFetch(componentsQ, n = -1);
   
+  #get total wbs
   sqlcmd_3 <- paste("select count(*) from (select distinct(w.wbs_element_key) FROM time_log_fact_hist tl
                               INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                               INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -66,7 +75,7 @@ for (proj in 1:projectCant) {
       
       if (sumSize > 0){
         
-        #CR
+        #time log in phase CR
         sqlcmd_7 <- paste("select ifnull(sum(tl.time_log_delta_minutes), 0) FROM time_log_fact_hist tl
                           INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                           INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -77,7 +86,7 @@ for (proj in 1:projectCant) {
         sumCR <- sumCRAux[1,1];
         
         if (sumCR > 0) {
-          #DR
+          #time log in phase DR
           sqlcmd_8 <- paste("select ifnull(sum(tl.time_log_delta_minutes), 0) FROM time_log_fact_hist tl
                             INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                             INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -88,7 +97,7 @@ for (proj in 1:projectCant) {
           sumDR <- sumDRAux[1,1];
           
           if (sumDR > 0) {
-            #D
+            #time log in phase D
             sqlcmd_9 <- paste("select ifnull(sum(tl.time_log_delta_minutes), 0) FROM time_log_fact_hist tl
                               INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                               INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -99,7 +108,7 @@ for (proj in 1:projectCant) {
             sumD <- sumDAux[1,1];
             
             if (sumD > 0) {
-              #C
+              #time log in phase C
               sqlcmd_10 <- paste("select ifnull(sum(tl.time_log_delta_minutes), 0) FROM time_log_fact_hist tl
                                  INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                                  INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -111,7 +120,7 @@ for (proj in 1:projectCant) {
                   
                   if (sumC > 0) {
                     
-                    #IT
+                    #time log in phase IT
                     sqlcmd_11 <- paste("select ifnull(sum(tl.time_log_delta_minutes), 0) FROM time_log_fact_hist tl
                                  INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                                  INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -123,7 +132,7 @@ for (proj in 1:projectCant) {
                     
                     if (sumIT > 0){
                       
-                      #ST
+                      #time log in phase ST
                       sqlcmd_11 <- paste("select ifnull(sum(tl.time_log_delta_minutes), 0) FROM time_log_fact_hist tl
                                  INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                                  INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -134,7 +143,7 @@ for (proj in 1:projectCant) {
                       sumST <- sumSTAux[1,1];
                       
                       if (sumST > 0){
-                        #Cantidad de defectos en ITST
+                        #total defects in ITST
                         sqlcmd_12 <- paste("select ifnull(count(*), 0) FROM defect_log_fact_hist d
                                         INNER JOIN plan_item pi ON pi.plan_item_key = d.plan_item_key
                                         INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
@@ -144,22 +153,22 @@ for (proj in 1:projectCant) {
                         defAux <- dbFetch(defQ, n = -1);
                         def <- defAux[1,1];
                         
-                        #Normalizar
+                        #Normalize
                         def <- round((def*1000)/sumSize,2);
                         
-                        #calculos para D y DR
+                        #calculate for D and DR
                         DRT <- round((2 * sumDR )/ sumD,1);
                         if (DRT > 1){
                           DRT <- 1;
                         }
                         
-                        #calculos para C y CR
+                        #calculate for C and CR
                         CRT <- round((2 * sumCR )/ sumC,1);
                         if (CRT > 1){
                           CRT <- 1;
                         }
                         
-                        #calculos para C y D
+                        #calculate for C and D
                         CDRT <- round(sumD/sumC,1);
                         if (CDRT > 1){
                           CDRT <- 1;
