@@ -1,5 +1,5 @@
 ############################################################
-#Plotting PQI* of WBSs (X) with the defects found in UT (Y)#
+#Plotting PQI* of WBSs (X) with the defects found in IT (Y)#
 ############################################################
 
 library(plotly)
