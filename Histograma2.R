@@ -67,7 +67,7 @@ for (p in 1:projectCant) {
                   INNER JOIN plan_item pi ON pi.plan_item_key = d.plan_item_key
                   INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key 
                   INNER JOIN phase ph2 ON ph2.phase_key = d.defect_removed_phase_key
-                  WHERE d.row_current_flag = 1 and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
+                  WHERE d.row_current_flag = 1 and pi.task_key IS NOT NULL and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
       countD <- dbSendQuery(con, sqlcmd_4);
       countDAux <- dbFetch(countD, n = -1);
       contar <- countDAux[1,1];
@@ -96,5 +96,22 @@ data <- list(
     type = "bar"
   )
 )
-response <- py$plotly(data, kwargs=list(filename="Histograma2", fileopt="overwrite"))
+
+layout <- list(
+  title = "Component defect counts",
+  font = list(family = "Raleway, sans-serif"),
+  showlegend = FALSE,
+  xaxis = list(
+    title = "WBS",
+    tickangle = -45
+  ),
+  yaxis = list(
+    title = "# Defects",
+    zeroline = FALSE,
+    gridwidth = 2
+  ),
+  bargap = 0.05
+)
+
+response <- py$plotly(data, kwargs=list(layout=layout, filename="Histograma2", fileopt="overwrite"))
 url <- response$url

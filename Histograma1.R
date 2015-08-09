@@ -67,7 +67,7 @@ for (p in 1:projectCant) {
                         INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key 
                         INNER JOIN measurement_type m ON m.measurement_type_key = s.measurement_type_key
                         INNER JOIN size_metric e ON e.size_metric_key = s.size_metric_key
-                        WHERE s.row_current_flag = 1 and  m.measurement_type_name = 'Actual' and e.size_metric_name = 'Lines of Code' and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
+                        WHERE s.row_current_flag = 1 and  m.measurement_type_name = 'Actual' and pi.task_key IS NOT NULL and e.size_metric_name = 'Lines of Code' and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
       sumSizeQ <- dbSendQuery(con, sqlcmd_4);
       sumSizeAux <- dbFetch(sumSizeQ, n = -1);
       sumSize <- sumSizeAux[1,1];
@@ -97,5 +97,22 @@ data <- list(
     type = "bar"
   )
 )
-response <- py$plotly(data, kwargs=list(filename="Histograma1", fileopt="overwrite"))
+
+layout <- list(
+  title = "the component size data",
+  font = list(family = "Raleway, sans-serif"),
+  showlegend = FALSE,
+  xaxis = list(
+    title = "WBS",
+    tickangle = -45
+  ),
+  yaxis = list(
+    title = "Size",
+    zeroline = FALSE,
+    gridwidth = 2
+  ),
+  bargap = 0.05
+)
+
+response <- py$plotly(data, kwargs=list(layout=layout, filename="Histograma1", fileopt="overwrite"))
 url <- response$url

@@ -66,7 +66,7 @@ for (p in 1:projectCant) {
                         INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key 
                         INNER JOIN measurement_type m ON m.measurement_type_key = s.measurement_type_key
                         INNER JOIN size_metric e ON e.size_metric_key = s.size_metric_key
-                        WHERE s.row_current_flag = 1 and  m.measurement_type_name = 'Actual' and e.size_metric_name = 'Lines of Code' and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
+                        WHERE s.row_current_flag = 1 and pi.task_key IS NOT NULL and  m.measurement_type_name = 'Actual' and e.size_metric_name = 'Lines of Code' and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
       sumSizeQ <- dbSendQuery(con, sqlcmd_5);
       sumSizeAux <- dbFetch(sumSizeQ, n = -1);
       sumSize <- sumSizeAux[1,1];
@@ -77,7 +77,7 @@ for (p in 1:projectCant) {
                         INNER JOIN plan_item pi ON pi.plan_item_key = d.plan_item_key
                         INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key 
                         INNER JOIN phase ph2 ON ph2.phase_key = d.defect_removed_phase_key
-                        WHERE d.row_current_flag = 1 and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c ," and ph2.phase_name like 'Unit Test'");
+                        WHERE d.row_current_flag = 1 and pi.task_key IS NOT NULL and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c ," and ph2.phase_name like 'Unit Test'");
         countD <- dbSendQuery(con, sqlcmd_4);
         countDAux <- dbFetch(countD, n = -1);
         contar <- countDAux[1,1];
@@ -109,5 +109,22 @@ data <- list(
     type = "bar"
   )
 )
-response <- py$plotly(data, kwargs=list(filename="Histograma4", fileopt="overwrite"))
+
+layout <- list(
+  title = "Component defect density in unit test",
+  font = list(family = "Raleway, sans-serif"),
+  showlegend = FALSE,
+  xaxis = list(
+    title = "WBS",
+    tickangle = -45
+  ),
+  yaxis = list(
+    title = "#defects/Size",
+    zeroline = FALSE,
+    gridwidth = 2
+  ),
+  bargap = 0.05
+)
+
+response <- py$plotly(data, kwargs=list(layout=layout, filename="Histograma4", fileopt="overwrite"))
 url <- response$url

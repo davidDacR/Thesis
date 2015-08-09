@@ -1,0 +1,14 @@
+Graficar
+
+**Equipos - personas
+**Cant de componentes por proyecto
+**Cant de defecto por componente
+**Densidad de defectos por componentes
+**Tamaño de componente
+Cant de personas por componente
+Tiempos por componente
+Proyectos - Equipos
+
+
+
+
