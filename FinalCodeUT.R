@@ -68,7 +68,8 @@ for (p in 1:projectCant) {
                         INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key 
                         INNER JOIN measurement_type m ON m.measurement_type_key = s.measurement_type_key
                         INNER JOIN size_metric e ON e.size_metric_key = s.size_metric_key
-                        WHERE s.row_current_flag = 1 and  m.measurement_type_name = 'Actual' and e.size_metric_name = 'Lines of Code' and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
+                        INNER JOIN phase ph ON ph.phase_key = pi.phase_key
+                        WHERE s.row_current_flag = 1 and  m.measurement_type_name = 'Actual' and e.size_metric_name = 'Lines of Code' and (ph.phase_name like 'Code' or ph.phase_name like 'TSP - Code') and pi.project_key  = ", proj, " and pi.wbs_element_key = ", c);
       sumSizeQ <- dbSendQuery(con, sqlcmd_4);
       sumSizeAux <- dbFetch(sumSizeQ, n = -1);
       sumSize <- sumSizeAux[1,1];
@@ -113,7 +114,7 @@ for (p in 1:projectCant) {
                                      INNER JOIN plan_item pi ON pi.plan_item_key = tl.plan_item_key
                                      INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
                                      INNER JOIN phase ph ON ph.phase_key = pi.phase_key
-                                     WHERE tl.row_current_flag = 1 and pi.project_key  =  ", proj, " and pi.wbs_element_key = ", c, " and (ph.phase_name like 'Code' or ph.phase_name like 'TSP-Code');");
+                                     WHERE tl.row_current_flag = 1 and pi.project_key  =  ", proj, " and pi.wbs_element_key = ", c, " and (ph.phase_name like 'Code' or ph.phase_name like 'TSP - Code');");
                   sumCQ <- dbSendQuery(con, sqlcmd_10);
                   sumCAux <- dbFetch(sumCQ, n = -1);
                   sumC <- sumCAux[1,1];
