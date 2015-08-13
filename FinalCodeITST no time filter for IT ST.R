@@ -159,8 +159,6 @@ for (p in 1:projectCant) {
                 vectorY[contCompGraf] <- def;
                 contCompGraf <- contCompGraf + 1;
                 
-                contador <- contador + 1;
-                
               }  
               
             }
