@@ -144,70 +144,82 @@ for (p in 1:projectCant) {
                       sumComp <- sumCompAux[1,1];
                       
                       if (sumComp > 0) {
-                      
-                        #get ordinal of UT in the process
-                        sqlcmd_12 <- paste("select distinct po.phase_ordinal FROM plan_item pi 
-                                          INNER JOIN phase ph ON ph.phase_key = pi.phase_key
-                                          INNER JOIN phase_order po ON po.phase_key = ph.phase_key
-                                          WHERE pi.project_key = ", proj, " and ph.phase_name like 'Compile';");
+                        
+                        #ordinal?
+                        sqlcmd_12 <- paste("select distinct ifnull(count(po.phase_ordinal),0) FROM plan_item pi 
+                                     INNER JOIN phase ph ON ph.phase_key = pi.phase_key
+                                     INNER JOIN phase_order po ON po.phase_key = ph.phase_key
+                                     WHERE pi.project_key = ", proj, " and ph.phase_name like 'Unit Test';");
                         ordinalQ <- dbSendQuery(con, sqlcmd_12);
                         ordinalQAux <- dbFetch(ordinalQ, n = -1);
                         ordinal <- ordinalQAux[1,1];
                         
-                        #total defects iny until UT
-                        sqlcmd_13 <- paste("select ifnull(count(d.defect_injected_phase_key), 0)
-                                          FROM defect_log_fact_hist d
-                                          INNER JOIN plan_item pi ON pi.plan_item_key = d.plan_item_key
-                                          INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
-                                          INNER JOIN phase ph ON ph.phase_key = d.defect_injected_phase_key
-                                          INNER JOIN phase_order po ON po.phase_key = d.defect_injected_phase_key
-                                          WHERE d.row_current_flag = 1 and pi.project_key  =  ", proj, " and pi.wbs_element_key = ", c, "and po.phase_ordinal < ", ordinal);
-                        defIQ <- dbSendQuery(con, sqlcmd_13);
-                        defIQAux <- dbFetch(defIQ, n = -1);
-                        defI <- defIQAux[1,1];
-                        
-                        #total defects rem until UT
-                        sqlcmd_14 <- paste("select ifnull(count(d.defect_removed_phase_key), 0)
+                        if (ordinal > 0){ 
+                      
+                          #get ordinal of UT in the process
+                          sqlcmd_12 <- paste("select distinct po.phase_ordinal FROM plan_item pi 
+                                            INNER JOIN phase ph ON ph.phase_key = pi.phase_key
+                                            INNER JOIN phase_order po ON po.phase_key = ph.phase_key
+                                            WHERE pi.project_key = ", proj, " and ph.phase_name like 'Compile';");
+                          ordinalQ <- dbSendQuery(con, sqlcmd_12);
+                          ordinalQAux <- dbFetch(ordinalQ, n = -1);
+                          ordinal <- ordinalQAux[1,1];
+                          
+                          #total defects iny until UT
+                          sqlcmd_13 <- paste("select ifnull(count(d.defect_injected_phase_key), 0)
                                             FROM defect_log_fact_hist d
                                             INNER JOIN plan_item pi ON pi.plan_item_key = d.plan_item_key
                                             INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
-                                            INNER JOIN phase ph ON ph.phase_key = d.defect_removed_phase_key
-                                            INNER JOIN phase_order po ON po.phase_key = d.defect_removed_phase_key
+                                            INNER JOIN phase ph ON ph.phase_key = d.defect_injected_phase_key
+                                            INNER JOIN phase_order po ON po.phase_key = d.defect_injected_phase_key
                                             WHERE d.row_current_flag = 1 and pi.project_key  =  ", proj, " and pi.wbs_element_key = ", c, "and po.phase_ordinal < ", ordinal);
-                        defRQ <- dbSendQuery(con, sqlcmd_14);
-                        defRQAux <- dbFetch(defRQ, n = -1);
-                        defR <- defRQAux[1,1];
-                        
-                        #Process Yield
-                        procY <- 0;
-                        if ((defI > 0) && (defI>=defR)){
-                          procY <- round(((defR/defI)*100),2);
+                          defIQ <- dbSendQuery(con, sqlcmd_13);
+                          defIQAux <- dbFetch(defIQ, n = -1);
+                          defI <- defIQAux[1,1];
+                          
+                          #total defects rem until UT
+                          sqlcmd_14 <- paste("select ifnull(count(d.defect_removed_phase_key), 0)
+                                              FROM defect_log_fact_hist d
+                                              INNER JOIN plan_item pi ON pi.plan_item_key = d.plan_item_key
+                                              INNER JOIN wbs_element w ON w.wbs_element_key = pi.wbs_element_key
+                                              INNER JOIN phase ph ON ph.phase_key = d.defect_removed_phase_key
+                                              INNER JOIN phase_order po ON po.phase_key = d.defect_removed_phase_key
+                                              WHERE d.row_current_flag = 1 and pi.project_key  =  ", proj, " and pi.wbs_element_key = ", c, "and po.phase_ordinal < ", ordinal);
+                          defRQ <- dbSendQuery(con, sqlcmd_14);
+                          defRQAux <- dbFetch(defRQ, n = -1);
+                          defR <- defRQAux[1,1];
+                          
+                          #Process Yield
+                          procY <- 0;
+                          if ((defI > 0) && (defI>=defR)){
+                            procY <- round(((defR/defI)*100),2);
+                          }
+                          
+                          #calculate for D and DR
+                          DRT <- round((2 * sumDR )/ sumD,2);
+                          if (DRT > 1){
+                            DRT <- 1;
+                          }
+                          
+                          #calculate for C and CR
+                          CRT <- round((2 * sumCR )/ sumC,2);
+                          if (CRT > 1){
+                            CRT <- 1;
+                          }
+                          
+                          #calculate for C and D
+                          CDRT <- round(sumD/sumC,2);
+                          if (CDRT > 1){
+                            CDRT <- 1;
+                          }
+                          
+                          pqiA <- round(DRT*CRT*CDRT,2);
+                          
+                          vectorT[contCompGraf] <- paste(proj, " - ", c);
+                          vectorX[contCompGraf] <- pqiA;
+                          vectorY[contCompGraf] <- procY;
+                          contCompGraf <- contCompGraf + 1;
                         }
-                        
-                        #calculate for D and DR
-                        DRT <- round((2 * sumDR )/ sumD,2);
-                        if (DRT > 1){
-                          DRT <- 1;
-                        }
-                        
-                        #calculate for C and CR
-                        CRT <- round((2 * sumCR )/ sumC,2);
-                        if (CRT > 1){
-                          CRT <- 1;
-                        }
-                        
-                        #calculate for C and D
-                        CDRT <- round(sumD/sumC,2);
-                        if (CDRT > 1){
-                          CDRT <- 1;
-                        }
-                        
-                        pqiA <- round(DRT*CRT*CDRT,2);
-                        
-                        vectorT[contCompGraf] <- paste(proj, " - ", c);
-                        vectorX[contCompGraf] <- pqiA;
-                        vectorY[contCompGraf] <- procY;
-                        contCompGraf <- contCompGraf + 1;
                       }
                       
                     }
