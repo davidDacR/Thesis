@@ -1,0 +1,22 @@
+Graficar
+
+equipos 35
+proyecto 109
+personas 334
+
+Equipo - Proyectos**
+Equipo - Personas**
+Proyectos - Personas**
+Componentes -Personas**
+Obs: equipos sin personas, equipos sin proyectos
+Proyecto - componentes**
+Proyecto - defectos
+Componentes- defectos**
+Proyecto - tiempo
+Componentes- tiempo
+Proyecto - size
+Componentes- size**
+
+
+
+
