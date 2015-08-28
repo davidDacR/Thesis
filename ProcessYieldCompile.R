@@ -213,12 +213,15 @@ for (p in 1:projectCant) {
                             CDRT <- 1;
                           }
                           
-                          pqiA <- round(DRT*CRT*CDRT,2);
+                          if ( (procY >0)){
+                            pqiA <- round(DRT*CRT*CDRT,2);
+                            
+                            vectorT[contCompGraf] <- paste(proj, " - ", c);
+                            vectorX[contCompGraf] <- pqiA;
+                            vectorY[contCompGraf] <- procY;
+                            contCompGraf <- contCompGraf + 1;
+                          }
                           
-                          vectorT[contCompGraf] <- paste(proj, " - ", c);
-                          vectorX[contCompGraf] <- pqiA;
-                          vectorY[contCompGraf] <- procY;
-                          contCompGraf <- contCompGraf + 1;
                         }
                       }
                       
