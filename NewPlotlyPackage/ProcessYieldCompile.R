@@ -1,5 +1,5 @@
 ################
-#ProcessYieldUT#
+##ProcessYield## 
 ################
 
 library(plotly)
@@ -154,7 +154,7 @@ for (p in 1:projectCant) {
                         ordinalQAux <- dbFetch(ordinalQ, n = -1);
                         ordinal <- ordinalQAux[1,1];
                         
-                        if (ordinal > 0){ 
+                        if (ordinal > 0){
                       
                           #get ordinal of UT in the process
                           sqlcmd_12 <- paste("select distinct po.phase_ordinal FROM plan_item pi 
@@ -213,12 +213,15 @@ for (p in 1:projectCant) {
                             CDRT <- 1;
                           }
                           
-                          pqiA <- round(DRT*CRT*CDRT,2);
+                          if ( (procY >0)){
+                            pqiA <- round(DRT*CRT*CDRT,2);
+                            
+                            vectorT[contCompGraf] <- paste(proj, " - ", c);
+                            vectorX[contCompGraf] <- pqiA;
+                            vectorY[contCompGraf] <- procY;
+                            contCompGraf <- contCompGraf + 1;
+                          }
                           
-                          vectorT[contCompGraf] <- paste(proj, " - ", c);
-                          vectorX[contCompGraf] <- pqiA;
-                          vectorY[contCompGraf] <- procY;
-                          contCompGraf <- contCompGraf + 1;
                         }
                       }
                       
