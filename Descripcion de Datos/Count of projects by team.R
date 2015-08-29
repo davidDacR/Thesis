@@ -89,15 +89,15 @@ data <- list(
 )
 
 layout <- list(
-  title = "Count of projects in Team",
+  title = "Cantidad de Proyectos por Equipo",
   font = list(family = "Raleway, sans-serif"),
   showlegend = FALSE,
   xaxis = list(
-    title = "teams",
+    title = "Equipos",
     tickangle = -45
   ),
   yaxis = list(
-    title = "#Projects",
+    title = "# Proyectos",
     zeroline = FALSE,
     gridwidth = 2
   ),

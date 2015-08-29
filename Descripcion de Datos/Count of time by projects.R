@@ -75,15 +75,15 @@ data <- list(
 )
 
 layout <- list(
-  title = "Time by Project",
+  title = "Tiempos por Proyecto",
   font = list(family = "Raleway, sans-serif"),
   showlegend = FALSE,
   xaxis = list(
-    title = "Projects",
+    title = "Proyectos",
     tickangle = -45
   ),
   yaxis = list(
-    title = "Time in minutes",
+    title = "Tiempos en minutos",
     zeroline = FALSE,
     gridwidth = 2
   ),

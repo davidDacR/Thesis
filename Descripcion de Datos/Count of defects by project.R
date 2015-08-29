@@ -62,15 +62,15 @@ data <- list(
 )
 
 layout <- list(
-  title = "Component defect counts",
+  title = "Cantidad de Defectos por Proyecto",
   font = list(family = "Raleway, sans-serif"),
   showlegend = FALSE,
   xaxis = list(
-    title = "Projects",
+    title = "Proyectos",
     tickangle = -45
   ),
   yaxis = list(
-    title = "# Defects",
+    title = "# Defectos",
     zeroline = FALSE,
     gridwidth = 2
   ),

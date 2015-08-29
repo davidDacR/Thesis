@@ -80,15 +80,15 @@ data <- list(
 )
 
 layout <- list(
-  title = "Size by Project",
+  title = "Tamanio en KLOCS por Proyecto",
   font = list(family = "Raleway, sans-serif"),
   showlegend = FALSE,
   xaxis = list(
-    title = "Projects",
+    title = "Proyectos",
     tickangle = -45
   ),
   yaxis = list(
-    title = "Size in KLOCS",
+    title = "Tamanio en KLOCS",
     zeroline = FALSE,
     gridwidth = 2
   ),

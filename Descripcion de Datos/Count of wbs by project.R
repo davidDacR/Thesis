@@ -65,15 +65,15 @@ data <- list(
 )
 
 layout <- list(
-  title = "Count of wbs in project",
+  title = "Cantidad de Componentes por Proyecto",
   font = list(family = "Raleway, sans-serif"),
   showlegend = FALSE,
   xaxis = list(
-    title = "Projects",
+    title = "Proyectos",
     tickangle = -45
   ),
   yaxis = list(
-    title = "#WBS",
+    title = "# Componentes",
     zeroline = FALSE,
     gridwidth = 2
   ),
