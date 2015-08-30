@@ -15,25 +15,17 @@ vectorT<-c();
 vectorX<-c();
 vectorY<-c();
 
-#get the list of projects
-sqlcmd_2 <- paste("select distinct(pi.project_key)  from  plan_item pi
-                   JOIN defect_log_fact_hist d  where d.plan_item_key=pi.plan_item_key;");  
-projectsQ <- dbSendQuery(con, sqlcmd_2);
-projectsAux <- dbFetch(projectsQ, n = -1);
+#get count of projects
+sqlcmd_1 <- paste("select count(*) from project");
+projectCantQ <- dbSendQuery(con, sqlcmd_1);
+projectCantAux <- dbFetch(projectCantQ, n = -1);
+projectCant <- projectCantAux[1,1];
 
-#get total projects
-sqlcmd_3 <- paste("select count(*) from (select distinct(pi.project_key)  from  plan_item pi
-                   JOIN defect_log_fact_hist d  where d.plan_item_key=pi.plan_item_key) as b");
-cantProjQ <- dbSendQuery(con, sqlcmd_3);
-cantProjAux <- dbFetch(cantProjQ, n = -1);
-projectCant <- cantProjAux[1,1];
+proj = 1;
 
-p = 1;
 contCompGraf = 1;
 
-for (p in 1:projectCant) {
-  
-  proj <- projectsAux[p,1];
+for (proj in 1:projectCant) {
              
   #size log
   sqlcmd_7 <- paste("select ifnull(sum(s.size_added_and_modified), 0) FROM size_fact_hist s 
