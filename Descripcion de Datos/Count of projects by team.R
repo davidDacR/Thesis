@@ -15,10 +15,6 @@ vectorT<-c();
 vectorX<-c();
 vectorY<-c();
 
-vectorT<-c();
-vectorX<-c();
-vectorY<-c();
-
 #get count of projects
 sqlcmd_1 <- paste("select count(*) from team");
 teamCantQ <- dbSendQuery(con, sqlcmd_1);
