@@ -28,7 +28,7 @@ for (proj in 1:projectCant) {
   
   #get total wbs
   sqlcmd_3 <- paste("select count(*) from (select distinct(pi.wbs_element_key) FROM plan_item pi
-                              WHERE pi.project_key  = ", proj, ") as b;");
+                              WHERE pi.task_key is not null and pi.project_key  = ", proj, ") as b;");
   cantCompQ <- dbSendQuery(con, sqlcmd_3);
   cantCompAux <- dbFetch(cantCompQ, n = -1);
   cantComp <- cantCompAux[1,1];
